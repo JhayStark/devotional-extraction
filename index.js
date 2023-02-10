@@ -3,7 +3,7 @@ const pdfParse = require("pdf-parse");
 
 const months = ["January", "Feburary"];
 
-let dataBuffer = fs.readFileSync("test2.pdf");
+let dataBuffer = fs.readFileSync("test.pdf");
 
 pdfParse(dataBuffer).then(function (data) {
   let text = data.text;
@@ -46,5 +46,6 @@ pdfParse(dataBuffer).then(function (data) {
     verse,
   };
 
-  console.log(devotionalObject);
+  fs.writeFileSync("devotions.json", JSON.stringify(devotionalObject));
+  process.exit(0);
 });
