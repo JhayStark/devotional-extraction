@@ -1,67 +1,42 @@
 const fs = require("fs");
 const pdfParse = require("pdf-parse");
 
-let dataBuffer = fs.readFileSync("test2.pdf");
-
-let devotions = [];
-let dataArray;
-
 const months = ["January", "Feburary"];
-let date;
-let title;
-let bibleText;
-let prayer;
-let verse;
-let devotionalMessage;
+
+let dataBuffer = fs.readFileSync("test2.pdf");
 
 pdfParse(dataBuffer).then(function (data) {
   let text = data.text;
-
   let lines = text.split("\n").filter(Boolean);
 
   let indexOfPC = lines.indexOf("PRAYER & CONFESSION");
-  devotionalMessage = lines.slice(2, indexOfPC).join("");
-
+  let devotionalMessage = lines.slice(2, indexOfPC).join("");
   let secondArray = lines.slice(indexOfPC + 1);
-  console.log(secondArray);
-  for (let i = 0; i < secondArray.length; i++) {
-    if (months.some((month) => secondArray[i].includes(month))) {
-      // There's at least one
-      date = secondArray[i];
-      dataArray = secondArray.filter((value) => value !== date);
-    }
-  }
-  for (let i = 0; i < dataArray.length; i++) {
-    if (dataArray[i] === dataArray[i]?.toUpperCase()) {
-      if (dataArray[i]) {
-        title = dataArray[i];
-        dataArray = dataArray.filter((value) => value != title);
-      }
-    }
-  }
 
-  dataArray.forEach((element) => {
-    if (element.startsWith("(") && element.endsWith(")")) {
-      verse = element;
-      dataArray = dataArray.filter((value) => value !== verse);
-    }
-  });
+  let date = secondArray.find((element) =>
+    months.some((month) => element.includes(month))
+  );
 
-  dataArray.forEach((element) => {
-    if (element.startsWith("“")) {
-      bibleText = element;
-      dataArray = dataArray.filter((value) => value !== bibleText);
-    }
-  });
+  let title = secondArray.find((element) => element === element.toUpperCase());
 
-  prayer = dataArray.join("");
-  // console.log(dataArray);
+  let verse = secondArray.find(
+    (element) => element.startsWith("(") && element.endsWith(")")
+  );
 
-  // let value = secondArray.join("").split(".");
-  // let prayer = value.shift();
-  // let thirdArray = value.join(".").split(")");
-  // let verse = thirdArray.shift();
-  // let title = thirdArray.join("");
+  let bibleText = secondArray.find(
+    (element) => element.startsWith("“") || element.startsWith(" “")
+  );
+
+  let prayer = secondArray
+    .filter(
+      (element) =>
+        element !== date &&
+        element !== title &&
+        element !== verse &&
+        element !== bibleText
+    )
+    .join("");
+
   let devotionalObject = {
     date,
     title,
@@ -70,6 +45,6 @@ pdfParse(dataBuffer).then(function (data) {
     bibleText,
     verse,
   };
-  // devotions.push(devotionalObject);
+
   console.log(devotionalObject);
 });
