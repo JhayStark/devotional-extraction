@@ -3,11 +3,12 @@ const pdfParse = require("pdf-parse");
 
 const months = ["January", "Feburary"];
 
-let dataBuffer = fs.readFileSync("test.pdf");
+let dataBuffer = fs.readFileSync("devo-messages_10-10.pdf");
 
 pdfParse(dataBuffer).then(function (data) {
   let text = data.text;
   let lines = text.split("\n").filter(Boolean);
+  // console.log(lines);
 
   let indexOfPC = lines.indexOf("PRAYER & CONFESSION");
   let devotionalMessage = lines.slice(2, indexOfPC).join("");
@@ -16,8 +17,13 @@ pdfParse(dataBuffer).then(function (data) {
   let date = secondArray.find((element) =>
     months.some((month) => element.includes(month))
   );
+  console.log(secondArray);
 
-  let title = secondArray.find((element) => element === element.toUpperCase());
+  let title = secondArray.find((element) => {
+    console.log(element);
+    console.log(element.toUpperCase());
+    return element === element.toUpperCase();
+  });
 
   let verse = secondArray.find(
     (element) => element.startsWith("(") && element.endsWith(")")
@@ -45,7 +51,7 @@ pdfParse(dataBuffer).then(function (data) {
     bibleText,
     verse,
   };
-
-  fs.writeFileSync("devotions.json", JSON.stringify(devotionalObject));
+  // console.log(devotionalObject);
+  // fs.writeFileSync("devotions.json", JSON.stringify(devotionalObject));
   process.exit(0);
 });
